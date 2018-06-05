@@ -16,13 +16,8 @@ scriptPath = getScriptPath()
 TOKEN = sys.argv[1]
 bot = telepot.Bot(TOKEN)
 
-<<<<<<< HEAD
 extraMessage = ""
-=======
-extraMessage = "\nDu kannst jetzt auch deine eigene Weckzeit einstellen. \
-Gib dafür einfach \"/zeit\" und danach deine gewünschte Zeit ein.\
-\nZum Beispiel /zeit 14:30."
->>>>>>> b0f69377a643337c6044441b1bc4e97bc5a3f894
+
 
 def init_db(): # Usually does not need to be called anywhere
 	db = sqlite3.connect(scriptPath + '/data/db.sqlite')
@@ -32,6 +27,7 @@ def init_db(): # Usually does not need to be called anywhere
 	''')
 	db.commit()
 	db.close()
+
 
 def insert_into_db(chat_id, state, hour, minute):
 	db = sqlite3.connect(scriptPath + '/data/db.sqlite')
@@ -66,6 +62,7 @@ def insert_into_db(chat_id, state, hour, minute):
 	db.commit()
 	db.close()
 
+
 def get_all_from_db():
 	db = sqlite3.connect(scriptPath + '/data/db.sqlite')
 	cursor = db.cursor()
@@ -74,6 +71,7 @@ def get_all_from_db():
 	db.commit()
 	db.close()
 	return user;
+
 
 def handle_notification(user):
 	chat_id = user[0]
@@ -97,18 +95,14 @@ def handle_notification(user):
 					message = 'Morgen ist ' + newday['title'] + '!' + extraMessage
 				else:
 					message = 'Übermorgen ist ' + newday['title'] + '!' + extraMessage
-				
-<<<<<<< HEAD
+
 				try:
 					bot.sendMessage(chat_id, message)
 					print("Sent a message for " + str(chat_id) + ": " + message)
 				except Exception as e:
 					print("Error while sending message!")
 					print(e)
-=======
-				bot.sendMessage(chat_id, message)
-				print("Sent a message for " + str(chat_id) + ": " + message)
->>>>>>> b0f69377a643337c6044441b1bc4e97bc5a3f894
+
 
 def land_lang_zu_kurz(land_lang):
 	switcher = {
@@ -130,6 +124,7 @@ def land_lang_zu_kurz(land_lang):
 		"Thüringen": "TH"
 	}
 	return switcher.get(land_lang, "nothing")
+
 
 def on_chat_message(msg):
 	content_type, chat_type, chat_id = telepot.glance(msg)
@@ -170,14 +165,11 @@ def on_chat_message(msg):
 		bot.sendMessage(chat_id, "Deine Weckzeit ist jetzt " + time_s)
 		return
 
-<<<<<<< HEAD
 	if msg['text'][:5] == "/info" or msg['text'][:5] == "/Info":
 		bot.sendMessage(chat_id, "Ich wurde von @linklink erschaffen, falls ich helfen konnte darfst du natürlich \
 gerne einen 👍 da lassen 😉\n\n\
 Meinen Sourcecode findet ihr unter https://github.com/2xlink/Feiertagbot. Schönen Tag noch 👋")
 
-=======
->>>>>>> b0f69377a643337c6044441b1bc4e97bc5a3f894
 def on_callback_query(msg):
 	query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
 	print('Callback Query:', query_id, from_id, query_data)
@@ -193,12 +185,8 @@ def on_callback_query(msg):
 
 	# bot.answerCallbackQuery(query_id, text='Dein Bundesland ist jetzt: ' + query_data)
 	bot.sendMessage(from_id, text='Dein Bundesland ist jetzt: ' + 
-<<<<<<< HEAD
 		query_data + '\nIch benachrichtige dich wenn ein Feiertag naht!\n' +
-		'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 13:00\n' + extraMessage)
-=======
-		query_data + '\nIch benachrichtige dich wenn ein Feiertag naht!')
->>>>>>> b0f69377a643337c6044441b1bc4e97bc5a3f894
+		'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 14:30\n' + extraMessage)
 
 
 bot.message_loop({'chat': on_chat_message,
