@@ -1,0 +1,4 @@
+*.sqlite
+*.sqlite.backup
+data/download_jsons.sh
+
