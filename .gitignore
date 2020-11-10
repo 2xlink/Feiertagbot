@@ -2,3 +2,5 @@
 *.sqlite.backup
 data/download_jsons.sh
 
+__pycache__
+
