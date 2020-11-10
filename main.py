@@ -13,12 +13,6 @@ def getScriptPath():
 
 scriptPath = getScriptPath()
 
-TOKEN = sys.argv[1]
-bot = telepot.Bot(TOKEN)
-
-extraMessage = ""
-
-
 def init_db(): # Usually does not need to be called anywhere
 	db = sqlite3.connect(scriptPath + '/data/db.sqlite')
 	cursor = db.cursor()
@@ -189,19 +183,24 @@ def on_callback_query(msg):
 		'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 14:30\n' + extraMessage)
 
 
-bot.message_loop({'chat': on_chat_message,
+if __name__ == "__main__":
+    
+    TOKEN = sys.argv[1]
+    bot = telepot.Bot(TOKEN)
+    extraMessage = ""
+
+    bot.message_loop({'chat': on_chat_message,
 				  'callback_query': on_callback_query})
-print('Listening ...')
+    print('Listening ...')
 
-while 1:
-	users = get_all_from_db()
-	
-	for user in users:
-		hour = user[2]
-		minute = user[3]
+    while 1:
+        users = get_all_from_db()
+        for user in users:
+            hour = user[2]
+            minute = user[3]
 
-		if datetime.now().time().hour == hour \
-		and datetime.now().time().minute == minute:
-			handle_notification(user) 
+            if datetime.now().time().hour == hour \
+                and datetime.now().time().minute == minute:
+                handle_notification(user) 
 
-	time.sleep(60)
+        time.sleep(60)
