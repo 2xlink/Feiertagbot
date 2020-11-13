@@ -167,7 +167,7 @@ def on_callback_query(msg):
         insert_into_db(from_id, query_data, None, None)
         bot.sendMessage(from_id, text='Dein Bundesland ist jetzt: ' + 
             query_data + '\nIch benachrichtige dich wenn ein Feiertag naht!\n' +
-            'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 14:30\n' + extraMessage)
+            'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 17:00\n' + extraMessage)
 
 
 if __name__ == "__main__":
