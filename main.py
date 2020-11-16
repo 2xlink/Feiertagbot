@@ -191,7 +191,7 @@ if __name__ == "__main__":
 
                 now = datetime.datetime.now().time()
 
-                if now.hour != hour and now.minute != minute:
+                if now.hour == hour and now.minute == minute:
                     handle_notification(user, holidays) 
 
             time.sleep(60)
