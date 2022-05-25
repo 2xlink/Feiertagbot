@@ -146,7 +146,7 @@ def on_chat_message(msg):
 
     elif msg['text'][:5] == "/info" or msg['text'][:5] == "/Info":
         bot.sendMessage(chat_id, "Ich wurde von @linklink erschaffen, falls ich hilfreich war darfst du natürlich \
-gerne einen 👍 da lassen 😉\n\n\
+gerne einen ⭐ da lassen 😉\n\n\
 📜 Sourcecode 👉 https://github.com/2xlink/Feiertagbot")
 
     else:
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     bot = telepot.Bot(TOKEN)
     extraMessage = ""
 
-    with open(scriptPath + "/data/holidays.json") as json_file:
+    with open(scriptPath + f"/data/holidays-{datetime.datetime.today().year}.json") as json_file:
         holidays = json.load(json_file)
 
         bot.message_loop({'chat': on_chat_message,
