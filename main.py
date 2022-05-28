@@ -2,7 +2,7 @@ import sys
 import os
 import time
 import telepot
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+import telepot.telepot as telepot
 import sqlite3
 import datetime
 import json
@@ -14,7 +14,7 @@ def getScriptPath():
 
 scriptPath = getScriptPath()
 
-def init_db(): # Usually does not need to be called anywhere
+def init_db(): # Not called by main. Use this to initially create the database.
     db = sqlite3.connect(scriptPath + '/data/db.sqlite')
     cursor = db.cursor()
     cursor.execute('''
@@ -48,12 +48,6 @@ def insert_into_db(chat_id, state, hour, minute):
 
     else: raise ValueError("State and hour and minute is not None in insert_into_db")
 
-    # if user == []:
-    #   cursor.execute('''INSERT INTO users(id, state, hour, minute)
-    #                     VALUES(?,?,?,?)''', (chat_id, state, hour, minute))
-    # else:
-    #   cursor.execute('''UPDATE users SET state = ?, hour = ?, minute = ?
-    #                     WHERE id = ? ''', (state, hour, minute, chat_id))
     db.commit()
     db.close()
 
@@ -110,26 +104,46 @@ def on_chat_message(msg):
         return
 
     if msg['text'][:6] == "/start":
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text='Baden-Württemberg', callback_data='BW')],
-            [InlineKeyboardButton(text='Bayern', callback_data='BY')],
-            [InlineKeyboardButton(text='Berlin', callback_data='BE')],
-            [InlineKeyboardButton(text='Brandenburg', callback_data='BB')],
-            [InlineKeyboardButton(text='Bremen', callback_data='HB')],
-            [InlineKeyboardButton(text='Hamburg', callback_data='HH')],
-            [InlineKeyboardButton(text='Hessen', callback_data='HE')],
-            [InlineKeyboardButton(text='Mecklenburg-Vorpommern', callback_data='MV')],
-            [InlineKeyboardButton(text='Niedersachsen', callback_data='NI')],
-            [InlineKeyboardButton(text='Nordrhein-Westfalen', callback_data='NW')],
-            [InlineKeyboardButton(text='Rheinland-Pfalz', callback_data='RP')],
-            [InlineKeyboardButton(text='Saarland', callback_data='SL')],
-            [InlineKeyboardButton(text='Sachsen', callback_data='SN')],
-            [InlineKeyboardButton(text='Sachsen-Anhalt', callback_data='ST')],
-            [InlineKeyboardButton(text='Schleswig-Holstein', callback_data='SH')],
-            [InlineKeyboardButton(text='Thüringen', callback_data='TH')],
-                   ])
+        try:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text='Baden-Württemberg', callback_data='BW')],
+                [InlineKeyboardButton(text='Bayern', callback_data='BY')],
+                [InlineKeyboardButton(text='Berlin', callback_data='BE')],
+                [InlineKeyboardButton(text='Brandenburg', callback_data='BB')],
+                [InlineKeyboardButton(text='Bremen', callback_data='HB')],
+                [InlineKeyboardButton(text='Hamburg', callback_data='HH')],
+                [InlineKeyboardButton(text='Hessen', callback_data='HE')],
+                [InlineKeyboardButton(text='Mecklenburg-Vorpommern', callback_data='MV')],
+                [InlineKeyboardButton(text='Niedersachsen', callback_data='NI')],
+                [InlineKeyboardButton(text='Nordrhein-Westfalen', callback_data='NW')],
+                [InlineKeyboardButton(text='Rheinland-Pfalz', callback_data='RP')],
+                [InlineKeyboardButton(text='Saarland', callback_data='SL')],
+                [InlineKeyboardButton(text='Sachsen', callback_data='SN')],
+                [InlineKeyboardButton(text='Sachsen-Anhalt', callback_data='ST')],
+                [InlineKeyboardButton(text='Schleswig-Holstein', callback_data='SH')],
+                [InlineKeyboardButton(text='Thüringen', callback_data='TH')],
+            ])
 
-        bot.sendMessage(chat_id, 'Wähle dein Bundesland', reply_markup=keyboard)
+            bot.sendMessage(chat_id, 'Wähle deine Region', reply_markup=keyboard)
+        except Exception as e: # Unsupported
+            print(e)
+            bot.sendMessage(chat_id, "Baden-Württemberg … BW\n\
+Bayern … BY\n\
+Berlin … BE\n\
+Brandenburg … BB\n\
+Bremen … HB\n\
+Hamburg … HH\n\
+Hessen … HE\n\
+Mecklenburg-Vorpommern … MV\n\
+Niedersachsen … NI\n\
+Nordrhein-Westfalen … NW\n\
+Rheinland-Pfalz … RP\n\
+Saarland … SL\n\
+Sachsen … SN\n\
+Sachsen-Anhalt … ST\n\
+Schleswig-Holstein … SH\n\
+Thüringen … TH\n\n\
+Bitte gib deine Region folgendermaßen ein: /region SN")
         return
 
     elif msg['text'][:5] == "/zeit" or msg['text'][:5] == "/Zeit":
@@ -141,33 +155,41 @@ def on_chat_message(msg):
                 \nZum Beispiel /zeit 14:30')
             return
         insert_into_db(chat_id, None, date.hour, date.minute)
-        bot.sendMessage(chat_id, "Deine Weckzeit ist jetzt " + time_s)
+        bot.sendMessage(chat_id, "Deine Alarmzeit ist jetzt " + time_s)
+        return
+
+    elif msg['text'][:7] == "/region" or msg['text'][:7] == "/Region":
+        state = msg['text'][8:]
+        set_state(state.upper(), chat_id)
         return
 
     elif msg['text'][:5] == "/info" or msg['text'][:5] == "/Info":
-        bot.sendMessage(chat_id, "Ich wurde von @linklink erschaffen, falls ich hilfreich war darfst du natürlich \
+        bot.sendMessage(chat_id, "Ich wurde von @linklink erschaffen. Falls ich hilfreich war, darfst du natürlich \
 gerne einen ⭐ da lassen 😉\n\n\
 📜 Sourcecode 👉 https://github.com/2xlink/Feiertagbot")
 
     else:
         bot.sendMessage(chat_id, random.choice(["?", "What?", "何?", "¿Que?", "Entschuldigung, wie bitte?"]))
 
+
+def set_state(state, from_id):
+    allowed_states = ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
+
+    if state not in allowed_states:
+        bot.sendMessage(from_id, "Region nicht gefunden. Bitte sende erneut eine Nachricht um das Menu aufzurufen.")
+        state = "SN"
+
+    else:
+        insert_into_db(from_id, state, None, None)
+        bot.sendMessage(from_id, text='Deine Region ist jetzt: ' + 
+            state + '\nIch benachrichtige dich wenn ein Feiertag naht!\n' +
+            'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 14:30\n' + extraMessage)
+
+
 def on_callback_query(msg):
     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
     print('Callback Query:', query_id, from_id, query_data)
-
-    allowed_states = ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"]
-
-    if query_data not in allowed_states:
-        bot.sendMessage(from_id, "Bundesland nicht gefunden.\n\
-            Bitte sende erneut eine Nachricht um das Menu aufzurufen.")
-        query_data = "SN"
-
-    else:
-        insert_into_db(from_id, query_data, None, None)
-        bot.sendMessage(from_id, text='Dein Bundesland ist jetzt: ' + 
-            query_data + '\nIch benachrichtige dich wenn ein Feiertag naht!\n' +
-            'Du kannst übrigens deine Alarmzeit einstellen, z.B. /zeit 14:30\n' + extraMessage)
+    set_state(query_data, from_id)
 
 
 if __name__ == "__main__":
