@@ -1,0 +1,3 @@
+[submodule "telepot"]
+	path = telepot
+	url = git@github.com:2xlink/telepot.git
