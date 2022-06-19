@@ -1,8 +1,8 @@
 import sys
 import os
 import time
-import telepot
 import telepot.telepot as telepot
+from telepot.telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 import sqlite3
 import datetime
 import json
